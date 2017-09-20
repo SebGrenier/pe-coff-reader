@@ -2,3 +2,6 @@
 *.db
 .vs/
 *.opendb
+bin/
+tests/
+x64/

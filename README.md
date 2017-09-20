@@ -1,2 +1,2 @@
 # Portable Executable and Common Object File Format reader
-Single header library for reading PE and COFF file headers.
+Single C++ header library for reading PE and COFF file headers.

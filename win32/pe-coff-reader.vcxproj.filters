@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\pe-coff.h">
+    <ClInclude Include="..\src\pe-coff.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
