@@ -59,7 +59,6 @@ namespace pecoff {
         constexpr uint16_t IMAGE_FILE_DLL = 0x2000; // The image file is a dynamic-link library (DLL). Such files are considered executable files for almost all purposes, although they cannot be directly run.
         constexpr uint16_t IMAGE_FILE_UP_SYSTEM_ONLY = 0x4000; // The file should be run only on a uniprocessor machine.
         constexpr uint16_t IMAGE_FILE_BYTES_REVERSED_HI = 0x8000; // Big endian: the MSB precedes the LSB in memory. This flag is deprecated and should be zero.
-
     }
 
     namespace PE_FORMATS
@@ -160,6 +159,55 @@ namespace pecoff {
         uint64_t reserved; // Reserved, must be zero
     };
 
+    struct Optional_Header_PE32_Plus
+    {
+        uint16_t magic; // The unsigned integer that identifies the state of the image file. The most common number is 0x10B, which identifies it as a normal executable file. 0x107 identifies it as a ROM image, and 0x20B identifies it as a PE32+ executable.
+        uint8_t major_linker_version; // The linker major version number.
+        uint8_t minor_linker_version; // The linker minor version number.
+        uint32_t size_of_code; // The size of the code (text) section, or the sum of all code sections if there are multiple sections.
+        uint32_t size_of_initialized_data; // The size of the initialized data section, or the sum of all such sections if there are multiple data sections.
+        uint32_t size_of_uninitialized_data; // The size of the uninitialized data section (BSS), or the sum of all such sections if there are multiple BSS sections.
+        uint32_t address_of_entry_point; // The address of the entry point relative to the image base when the executable file is loaded into memory. For program images, this is the starting address. For device drivers, this is the address of the initialization function. An entry point is optional for DLLs. When no entry point is present, this field must be zero.
+        uint32_t base_of_code; // The address that is relative to the image base of the beginning-of-code section when it is loaded into memory.
+        uint64_t image_base; // The preferred address of the first byte of image when loaded into memory; must be a multiple of 64 K. The default for DLLs is 0x10000000. The default for Windows CE EXEs is 0x00010000. The default for Windows NT, Windows 2000, Windows XP, Windows 95, Windows 98, and Windows Me is 0x00400000.
+        uint32_t section_alignment; // The alignment (in bytes) of sections when they are loaded into memory. It must be greater than or equal to FileAlignment. The default is the page size for the architecture.
+        uint32_t file_alignment; // The alignment factor (in bytes) that is used to align the raw data of sections in the image file. The value should be a power of 2 between 512 and 64 K, inclusive. The default is 512. If the SectionAlignment is less than the architecture’s page size, then FileAlignment must match SectionAlignment.
+        uint16_t major_operating_system_version; // The major version number of the required operating system.
+        uint16_t minor_operating_system_version; // The minor version number of the required operating system.
+        uint16_t major_image_version; // The major version number of the image.
+        uint16_t minor_image_version; // The minor version number of the image.
+        uint16_t major_subsystem_version; // The major version number of the subsystem.
+        uint16_t minor_subsystem_version; // The minor version number of the subsystem.
+        uint32_t win32_version_value; // Reserved, must be zero.
+        uint32_t size_of_image; // The size (in bytes) of the image, including all headers, as the image is loaded in memory. It must be a multiple of SectionAlignment.
+        uint32_t size_of_headers; // The combined size of an MS DOS stub, PE header, and section headers rounded up to a multiple of FileAlignment.
+        uint32_t checksum; // The image file checksum. The algorithm for computing the checksum is incorporated into IMAGHELP.DLL. The following are checked for validation at load time: all drivers, any DLL loaded at boot time, and any DLL that is loaded into a critical Windows process.
+        uint16_t subsystem; // The subsystem that is required to run this image. For more information, see “Windows Subsystem” later in this specification.
+        uint16_t dll_characteristics; // For more information, see “DLL Characteristics” later in this specification.
+        uint64_t size_of_stack_reserve; // The size of the stack to reserve. Only SizeOfStackCommit is committed; the rest is made available one page at a time until the reserve size is reached.
+        uint64_t size_of_stack_commit; // The size of the stack to commit.
+        uint64_t size_of_heap_reserve; // The size of the local heap space to reserve. Only SizeOfHeapCommit is committed; the rest is made available one page at a time until the reserve size is reached.
+        uint64_t size_of_heap_commit; // The size of the local heap space to commit.
+        uint32_t loader_flags; // Reserved, must be zero.
+        uint32_t number_of_rva_and_sizes; // The number of data-directory entries in the remainder of the optional header. Each describes a location and size.
+        uint64_t export_table; // The export table address and size. For more information see section 6.3, “The .edata Section (Image Only).”
+        uint64_t import_table; // The import table address and size. For more information, see section 6.4, “The .idata Section.”
+        uint64_t resource_table; // The resource table address and size.For more information, see section 6.9, “The.rsrc Section.”
+        uint64_t exception_table; // The exception table address and size. For more information, see section 6.5, “The .pdata Section.”
+        uint64_t certificate_table; // The attribute certificate table address and size. For more information, see section 5.7, “The Attribute Certificate Table (Image Only).”
+        uint64_t base_relocation_table; // The base relocation table address and size. For more information, see section 6.6, "The .reloc Section (Image Only)."
+        uint64_t debug; // The debug data starting address and size. For more information, see section 6.1, “The .debug Section.”
+        uint64_t architecture; // Reserved, must be 0
+        uint64_t global_ptr; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero.
+        uint64_t tls_table; // The thread local storage (TLS) table address and size. For more information, see section 6.7, “The .tls Section.”
+        uint64_t load_config_table; // The load configuration table address and size. For more information, see section 6.8, “The Load Configuration Structure (Image Only).”
+        uint64_t bound_import; // The bound import table address and size.
+        uint64_t iat; // The import address table address and size. For more information, see section 6.4.4, “Import Address Table.”
+        uint64_t delay_import_descriptor; // The delay import descriptor address and size. For more information, see section 5.8, “Delay-Load Import Tables (Image Only).”
+        uint64_t clr_runtime_header; // The CLR runtime header address and size. For more information, see section 6.10, “The .cormeta Section (Object Only).”
+        uint64_t reserved; // Reserved, must be zero
+    };
+
     template <typename T>
     T read(std::ifstream &input)
     {
@@ -215,16 +263,28 @@ namespace pecoff {
         return FILE_TYPE::UNKNOWN_FILE;
     }
 
-    inline DOS_Header get_dos_header(std::ifstream &input, int offset = 0)
+    inline DOS_Header get_dos_header(std::ifstream &input, uint64_t offset = 0)
     {
         input.seekg(offset);
         return read<DOS_Header>(input);
     }
 
-    inline COFF_Header get_coff_header(std::ifstream &input, int offset = 0)
+    inline COFF_Header get_coff_header(std::ifstream &input, uint64_t offset = 0)
     {
         input.seekg(offset);
         return read<COFF_Header>(input);
+    }
+
+    inline Optional_Header_PE32 get_optional_header_pe32(std::ifstream &input, uint64_t offset)
+    {
+        input.seekg(offset);
+        return read<Optional_Header_PE32>(input);
+    }
+
+    inline Optional_Header_PE32_Plus get_optional_header_pe32_plus(std::ifstream &input, uint64_t offset)
+    {
+        input.seekg(offset);
+        return read<Optional_Header_PE32_Plus>(input);
     }
 }
 
