@@ -3,5 +3,5 @@
 .vs/
 *.opendb
 bin/
-tests/
 x64/
+Debug/
