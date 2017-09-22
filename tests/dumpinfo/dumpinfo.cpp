@@ -2,8 +2,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace std;
+
+ostream& operator << (ostream &out, pecoff::Image_Data_Directory &idd) {
+    out << "{Virtual Address: " << idd.virtual_address << ", Size: " << idd.size << "}";
+    return out;
+}
 
 void print_section_separator (const std::string &section_name)
 {
@@ -184,6 +190,22 @@ void print_optional_header_pe32_plus(pecoff::Optional_Header_PE32_Plus &header)
     print_info("Reserved", header.reserved);
 }
 
+void print_section_header(pecoff::Section_Header &header)
+{
+    print_section_separator("SECTION HEADER");
+
+    print_info("Name", header.name);
+    print_info("Virtual Size", header.virtual_size);
+    print_info("Virtual Address", header.virtual_address);
+    print_info("Size Of Raw Data", header.size_of_raw_data);
+    print_info("Pointer To Raw Data", header.pointer_to_raw_data);
+    print_info("Pointer To Relocations", header.pointer_to_relocations);
+    print_info("Pointer To Line Numbers", header.pointer_to_line_numbers);
+    print_info("Number Of Relocations", header.number_of_relocations);
+    print_info("Number Of Line Numbers", header.number_of_line_numbers);
+    print_info("Characteristics", header.characteristics);
+}
+
 void print_pe_file_info(ifstream &input)
 {
     auto dos_header = pecoff::get_dos_header(input);
@@ -206,6 +228,15 @@ void print_pe_file_info(ifstream &input)
     } else if (coff_header.size_of_optional_header == sizeof(pecoff::Optional_Header_PE32_Plus)) {
         auto optional_header = pecoff::get_optional_header_pe32_plus(input, optional_header_offset);
         print_optional_header_pe32_plus(optional_header);
+    }
+
+    auto section_header_offset = input.tellg();
+    vector<pecoff::Section_Header> section_headers;
+    for (auto i = 0; i < coff_header.number_of_section; ++i) {
+        auto section_header = pecoff::get_section_header(input, section_header_offset);
+        section_header_offset = input.tellg();
+        section_headers.push_back(section_header);
+        print_section_header(section_header);
     }
 }
 

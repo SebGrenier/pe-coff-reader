@@ -109,6 +109,12 @@ namespace pecoff {
         uint16_t characteristics; // The flags that indicate the attributes of the file. For specific flag values, see section 3.3.2, “Characteristics.”
     };
 
+    struct Image_Data_Directory
+    {
+        uint32_t virtual_address; // Address of the table relative to the base address of the image loaded in memory.
+        uint32_t size; // Size in bytes.
+    };
+
     struct Optional_Header_PE32
     {
         uint16_t magic; // The unsigned integer that identifies the state of the image file. The most common number is 0x10B, which identifies it as a normal executable file. 0x107 identifies it as a ROM image, and 0x20B identifies it as a PE32+ executable.
@@ -141,22 +147,22 @@ namespace pecoff {
         uint32_t size_of_heap_commit; // The size of the local heap space to commit.
         uint32_t loader_flags; // Reserved, must be zero.
         uint32_t number_of_rva_and_sizes; // The number of data-directory entries in the remainder of the optional header. Each describes a location and size.
-        uint64_t export_table; // The export table address and size. For more information see section 6.3, “The .edata Section (Image Only).”
-        uint64_t import_table; // The import table address and size. For more information, see section 6.4, “The .idata Section.”
-        uint64_t resource_table; // The resource table address and size.For more information, see section 6.9, “The.rsrc Section.”
-        uint64_t exception_table; // The exception table address and size. For more information, see section 6.5, “The .pdata Section.”
-        uint64_t certificate_table; // The attribute certificate table address and size. For more information, see section 5.7, “The Attribute Certificate Table (Image Only).”
-        uint64_t base_relocation_table; // The base relocation table address and size. For more information, see section 6.6, "The .reloc Section (Image Only)."
-        uint64_t debug; // The debug data starting address and size. For more information, see section 6.1, “The .debug Section.”
-        uint64_t architecture; // Reserved, must be 0
-        uint64_t global_ptr; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero.
-        uint64_t tls_table; // The thread local storage (TLS) table address and size. For more information, see section 6.7, “The .tls Section.”
-        uint64_t load_config_table; // The load configuration table address and size. For more information, see section 6.8, “The Load Configuration Structure (Image Only).”
-        uint64_t bound_import; // The bound import table address and size.
-        uint64_t iat; // The import address table address and size. For more information, see section 6.4.4, “Import Address Table.”
-        uint64_t delay_import_descriptor; // The delay import descriptor address and size. For more information, see section 5.8, “Delay-Load Import Tables (Image Only).”
-        uint64_t clr_runtime_header; // The CLR runtime header address and size. For more information, see section 6.10, “The .cormeta Section (Object Only).”
-        uint64_t reserved; // Reserved, must be zero
+        Image_Data_Directory export_table; // The export table address and size. For more information see section 6.3, “The .edata Section (Image Only).”
+        Image_Data_Directory import_table; // The import table address and size. For more information, see section 6.4, “The .idata Section.”
+        Image_Data_Directory resource_table; // The resource table address and size.For more information, see section 6.9, “The.rsrc Section.”
+        Image_Data_Directory exception_table; // The exception table address and size. For more information, see section 6.5, “The .pdata Section.”
+        Image_Data_Directory certificate_table; // The attribute certificate table address and size. For more information, see section 5.7, “The Attribute Certificate Table (Image Only).”
+        Image_Data_Directory base_relocation_table; // The base relocation table address and size. For more information, see section 6.6, "The .reloc Section (Image Only)."
+        Image_Data_Directory debug; // The debug data starting address and size. For more information, see section 6.1, “The .debug Section.”
+        Image_Data_Directory architecture; // Reserved, must be 0
+        Image_Data_Directory global_ptr; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero.
+        Image_Data_Directory tls_table; // The thread local storage (TLS) table address and size. For more information, see section 6.7, “The .tls Section.”
+        Image_Data_Directory load_config_table; // The load configuration table address and size. For more information, see section 6.8, “The Load Configuration Structure (Image Only).”
+        Image_Data_Directory bound_import; // The bound import table address and size.
+        Image_Data_Directory iat; // The import address table address and size. For more information, see section 6.4.4, “Import Address Table.”
+        Image_Data_Directory delay_import_descriptor; // The delay import descriptor address and size. For more information, see section 5.8, “Delay-Load Import Tables (Image Only).”
+        Image_Data_Directory clr_runtime_header; // The CLR runtime header address and size. For more information, see section 6.10, “The .cormeta Section (Object Only).”
+        Image_Data_Directory reserved; // Reserved, must be zero
     };
 
     struct Optional_Header_PE32_Plus
@@ -190,22 +196,36 @@ namespace pecoff {
         uint64_t size_of_heap_commit; // The size of the local heap space to commit.
         uint32_t loader_flags; // Reserved, must be zero.
         uint32_t number_of_rva_and_sizes; // The number of data-directory entries in the remainder of the optional header. Each describes a location and size.
-        uint64_t export_table; // The export table address and size. For more information see section 6.3, “The .edata Section (Image Only).”
-        uint64_t import_table; // The import table address and size. For more information, see section 6.4, “The .idata Section.”
-        uint64_t resource_table; // The resource table address and size.For more information, see section 6.9, “The.rsrc Section.”
-        uint64_t exception_table; // The exception table address and size. For more information, see section 6.5, “The .pdata Section.”
-        uint64_t certificate_table; // The attribute certificate table address and size. For more information, see section 5.7, “The Attribute Certificate Table (Image Only).”
-        uint64_t base_relocation_table; // The base relocation table address and size. For more information, see section 6.6, "The .reloc Section (Image Only)."
-        uint64_t debug; // The debug data starting address and size. For more information, see section 6.1, “The .debug Section.”
-        uint64_t architecture; // Reserved, must be 0
-        uint64_t global_ptr; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero.
-        uint64_t tls_table; // The thread local storage (TLS) table address and size. For more information, see section 6.7, “The .tls Section.”
-        uint64_t load_config_table; // The load configuration table address and size. For more information, see section 6.8, “The Load Configuration Structure (Image Only).”
-        uint64_t bound_import; // The bound import table address and size.
-        uint64_t iat; // The import address table address and size. For more information, see section 6.4.4, “Import Address Table.”
-        uint64_t delay_import_descriptor; // The delay import descriptor address and size. For more information, see section 5.8, “Delay-Load Import Tables (Image Only).”
-        uint64_t clr_runtime_header; // The CLR runtime header address and size. For more information, see section 6.10, “The .cormeta Section (Object Only).”
-        uint64_t reserved; // Reserved, must be zero
+        Image_Data_Directory export_table; // The export table address and size. For more information see section 6.3, “The .edata Section (Image Only).”
+        Image_Data_Directory import_table; // The import table address and size. For more information, see section 6.4, “The .idata Section.”
+        Image_Data_Directory resource_table; // The resource table address and size.For more information, see section 6.9, “The.rsrc Section.”
+        Image_Data_Directory exception_table; // The exception table address and size. For more information, see section 6.5, “The .pdata Section.”
+        Image_Data_Directory certificate_table; // The attribute certificate table address and size. For more information, see section 5.7, “The Attribute Certificate Table (Image Only).”
+        Image_Data_Directory base_relocation_table; // The base relocation table address and size. For more information, see section 6.6, "The .reloc Section (Image Only)."
+        Image_Data_Directory debug; // The debug data starting address and size. For more information, see section 6.1, “The .debug Section.”
+        Image_Data_Directory architecture; // Reserved, must be 0
+        Image_Data_Directory global_ptr; // The RVA of the value to be stored in the global pointer register. The size member of this structure must be set to zero.
+        Image_Data_Directory tls_table; // The thread local storage (TLS) table address and size. For more information, see section 6.7, “The .tls Section.”
+        Image_Data_Directory load_config_table; // The load configuration table address and size. For more information, see section 6.8, “The Load Configuration Structure (Image Only).”
+        Image_Data_Directory bound_import; // The bound import table address and size.
+        Image_Data_Directory iat; // The import address table address and size. For more information, see section 6.4.4, “Import Address Table.”
+        Image_Data_Directory delay_import_descriptor; // The delay import descriptor address and size. For more information, see section 5.8, “Delay-Load Import Tables (Image Only).”
+        Image_Data_Directory clr_runtime_header; // The CLR runtime header address and size. For more information, see section 6.10, “The .cormeta Section (Object Only).”
+        Image_Data_Directory reserved; // Reserved, must be zero
+    };
+
+    struct Section_Header
+    {
+        char name[8];
+        uint32_t virtual_size;
+        uint32_t virtual_address;
+        uint32_t size_of_raw_data;
+        uint32_t pointer_to_raw_data;
+        uint32_t pointer_to_relocations;
+        uint32_t pointer_to_line_numbers;
+        uint16_t number_of_relocations;
+        uint16_t number_of_line_numbers;
+        uint32_t characteristics;
     };
 
     template <typename T>
@@ -285,6 +305,12 @@ namespace pecoff {
     {
         input.seekg(offset);
         return read<Optional_Header_PE32_Plus>(input);
+    }
+
+    inline Section_Header get_section_header(std::ifstream &input, uint64_t offset)
+    {
+        input.seekg(offset);
+        return read<Section_Header>(input);
     }
 }
 
