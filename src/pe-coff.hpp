@@ -75,27 +75,81 @@ namespace pecoff {
         COFF_FILE
     };
 
-    struct DOS_Header
+    struct BinaryBlob
     {
-        uint16_t signature;
-        uint16_t lastsize;
-        uint16_t nblocks;
-        uint16_t nreloc;
-        uint16_t hdrsize;
-        uint16_t minalloc;
-        uint16_t maxalloc;
-        uint16_t ss;
-        uint16_t sp;
-        uint16_t checksum;
-        uint16_t ip;
-        uint16_t cs;
-        uint16_t relocpos;
-        uint16_t noverlay;
-        uint16_t reserved1[4];
-        uint16_t oem_id;
-        uint16_t oem_info;
-        uint16_t reserved2[10];
-        uint32_t e_lfanew; // Offset to the 'PE\0\0' signature relative to the beginning of the file
+        void *data;
+        uint64_t size;
+        uint64_t file_address;
+    };
+
+    template <typename T, int Offset>
+    class Accessor
+    {
+    public:
+        Accessor() = delete;
+        explicit Accessor (BinaryBlob *blob) : data_ref(blob) {}
+
+        T& get() const
+        {
+            if (Offset + sizeof(T) <= data_ref->size)
+                return static_cast<T>(*(data_ref + Offset));
+            return T(0);
+        }
+
+        T* get_ptr() const
+        {
+            if (Offset + sizeof(T) <= data_ref->size)
+                return static_cast<T*>(data_ref + Offset);
+            return nullptr;
+        }
+
+    private:
+        BinaryBlob *data_ref;
+    };
+
+    struct DOS_Header : BinaryBlob
+    {
+        Accessor<uint16_t, 0> signature;
+        Accessor<uint16_t, 2> lastsize;
+        Accessor<uint16_t, 4> nblocks;
+        Accessor<uint16_t, 6> nreloc;
+        Accessor<uint16_t, 8> hdrsize;
+        Accessor<uint16_t, 10> minalloc;
+        Accessor<uint16_t, 12> maxalloc;
+        Accessor<uint16_t, 14> ss;
+        Accessor<uint16_t, 16> sp;
+        Accessor<uint16_t, 18> checksum;
+        Accessor<uint16_t, 20> ip;
+        Accessor<uint16_t, 22> cs;
+        Accessor<uint16_t, 24> relocpos;
+        Accessor<uint16_t, 26> noverlay;
+        Accessor<uint16_t[4], 28> reserved1;
+        Accessor<uint16_t, 36> oem_id;
+        Accessor<uint16_t, 38> oem_info;
+        Accessor<uint16_t[10], 40> reserved2;
+        Accessor<uint32_t, 50> e_lfanew; // Offset to the 'PE\0\0' signature relative to the beginning of the file
+
+        DOS_Header ()
+            : signature(this)
+            , lastsize(this)
+            , nblocks(this)
+            , nreloc(this)
+            , hdrsize(this)
+            , minalloc(this)
+            , maxalloc(this)
+            , ss(this)
+            , sp(this)
+            , checksum(this)
+            , ip(this)
+            , cs(this)
+            , relocpos(this)
+            , noverlay(this)
+            , reserved1(this)
+            , oem_id(this)
+            , oem_info(this)
+            , reserved2(this)
+            , e_lfanew(this)
+        {}
     };
 
     struct COFF_Header
